@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
+	"gogit/fs"
 
 	"github.com/spf13/cobra"
 )
@@ -11,7 +14,14 @@ var initCmd = &cobra.Command{
 	Short: "Initialize a new repository",
 	Args:  cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("init called")
+		cwd, err := os.Getwd()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		fmt.Println("Initializing empty repository in", cwd)
+		fs.CreateDir(cwd + "/.gogit")
 	},
 }
 
