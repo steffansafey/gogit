@@ -1,6 +1,7 @@
 package fs
 
 import (
+	"errors"
 	"log"
 	"os"
 )
@@ -14,8 +15,20 @@ func CreateFile(path string) {
 }
 
 func CreateDir(path string) {
-	err := os.Mkdir(path, 0755)
+	// Create the `objects` directory if it doesn't exist
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		os.Mkdir(path, 0755)
+	}
+}
+
+func WriteBlob(path string, bytes []byte) []byte {
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer file.Close()
+
+	file.Write(bytes)
+
+	return bytes
 }
