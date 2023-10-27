@@ -39,3 +39,15 @@ func HashObject(path string) {
 
 	fmt.Println(hash_string)
 }
+
+func ReadObject(hash string) []byte {
+	// Read the file_bytes into memory
+	file_bytes, err := os.ReadFile(".gogit/objects/" + hash)
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	return file_bytes
+}
