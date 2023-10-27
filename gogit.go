@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"gogit/cmd"
+)
 
 func main() {
-	fmt.Println("Hello, cli!")
+	cmd.Execute()
 }
