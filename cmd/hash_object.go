@@ -12,7 +12,7 @@ var hashObjectCommand = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		// Hash the file and write it to the objects directory
-		data.HashObject(args[0])
+		data.HashObject(args[0], data.Blob)
 	},
 }
 

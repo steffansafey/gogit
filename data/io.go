@@ -8,7 +8,19 @@ import (
 	"gogit/fs"
 )
 
-func HashObject(path string) {
+// Type of file to hash
+type FileType string
+
+const (
+	Blob FileType = "blob"
+	Any  FileType = "any"
+)
+
+func HashObject(path string, filetype FileType) {
+	if filetype == Any {
+		fmt.Println("A specific filetype must be specified")
+		os.Exit(1)
+	}
 	cwd, err := os.Getwd()
 
 	if err != nil {
@@ -20,13 +32,15 @@ func HashObject(path string) {
 	fs.CreateDir(cwd + "/.gogit/objects")
 
 	// Hash the file
-	// Read the file_bytes into memory
 	file_bytes, err := os.ReadFile(path)
 
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
+	// Append the type of file to the beginning of the file_bytes
+	file_bytes = append([]byte(filetype+"\x00"), file_bytes...)
 
 	// Hash the file
 	hash := sha1.New()
@@ -40,7 +54,7 @@ func HashObject(path string) {
 	fmt.Println(hash_string)
 }
 
-func ReadObject(hash string) []byte {
+func ReadObject(hash string, expected_type FileType) []byte {
 	// Read the file_bytes into memory
 	file_bytes, err := os.ReadFile(".gogit/objects/" + hash)
 
@@ -49,5 +63,22 @@ func ReadObject(hash string) []byte {
 		os.Exit(1)
 	}
 
-	return file_bytes
+	// Check the type of the file (search for the first null byte)
+	null_byte_index := 0
+	for i, b := range file_bytes {
+		if b == 0 {
+			null_byte_index = i
+			break
+		}
+	}
+
+	// Check the type of the file
+	filetype := FileType(file_bytes[:null_byte_index])
+
+	if expected_type != Any && filetype != expected_type {
+		fmt.Println("Expected file type `", expected_type, "` but got `", filetype, "`")
+	}
+
+	// Return the file_bytes without the type
+	return file_bytes[null_byte_index+1:]
 }

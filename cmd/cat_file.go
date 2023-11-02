@@ -11,7 +11,7 @@ var catFileCommand = &cobra.Command{
 	Short: "Cats a file if it exists in the objects directory",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		bytes := data.ReadObject(args[0])
+		bytes := data.ReadObject(args[0], data.Any)
 		print(string(bytes))
 	},
 }
