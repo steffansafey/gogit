@@ -13,23 +13,15 @@ type FileType string
 
 const (
 	Blob FileType = "blob"
+	Tree FileType = "tree"
 	Any  FileType = "any"
 )
 
-func HashObject(path string, filetype FileType) {
+func HashObject(path string, filetype FileType) string {
 	if filetype == Any {
 		fmt.Println("A specific filetype must be specified")
 		os.Exit(1)
 	}
-	cwd, err := os.Getwd()
-
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	// Create the `objects` directory if it doesn't exist
-	fs.CreateDir(cwd + "/.gogit/objects")
 
 	// Hash the file
 	file_bytes, err := os.ReadFile(path)
@@ -39,6 +31,19 @@ func HashObject(path string, filetype FileType) {
 		os.Exit(1)
 	}
 
+	return HashBytes(file_bytes, filetype)
+}
+
+func HashBytes(file_bytes []byte, filetype FileType) string {
+
+	cwd, err := os.Getwd()
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	// Create the `objects` directory if it doesn't exist
+	fs.CreateDir(cwd + "/.gogit/objects")
 	// Append the type of file to the beginning of the file_bytes
 	file_bytes = append([]byte(filetype+"\x00"), file_bytes...)
 
@@ -51,7 +56,8 @@ func HashObject(path string, filetype FileType) {
 	// Write the file to the objects directory
 	fs.WriteBlob(".gogit/objects/"+hash_string, file_bytes)
 
-	fmt.Println(hash_string)
+	fmt.Println("wrote obj " + hash_string + " " + string(filetype))
+	return hash_string
 }
 
 func ReadObject(hash string, expected_type FileType) []byte {

@@ -9,6 +9,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type TreeEntry struct {
+	name      string
+	oid       string
+	file_type data.FileType
+}
+
 var writeTreeCommand = &cobra.Command{
 	Use:   "write-tree",
 	Short: "Writes the current state of the index to the objects directory",
@@ -23,7 +29,8 @@ var writeTreeCommand = &cobra.Command{
 	},
 }
 
-func writeTree(directory string) {
+func writeTree(directory string) string {
+
 	// List the entries and directories in the current directory
 	entries, err := os.ReadDir(directory)
 	if err != nil {
@@ -31,6 +38,7 @@ func writeTree(directory string) {
 		os.Exit(1)
 	}
 
+	tree_entries := []TreeEntry{}
 	// Iterate over the files and directories
 	for _, entry := range entries {
 		if isIgnored(entry) {
@@ -39,12 +47,23 @@ func writeTree(directory string) {
 
 		path := directory + "/" + entry.Name()
 		if entry.IsDir() {
-			writeTree(path)
+			oid := writeTree(path)
+			tree_entries = append(tree_entries, TreeEntry{entry.Name(), oid, data.Tree})
 		} else {
-			data.HashObject(path, data.Blob)
-			fmt.Println("hashed " + path)
+			oid := data.HashObject(path, data.Blob)
+			tree_entries = append(tree_entries, TreeEntry{entry.Name(), oid, data.Blob})
 		}
 	}
+
+	// Write the tree_str object to a file
+	tree_str := ""
+	for _, tree_entry := range tree_entries {
+		tree_str += fmt.Sprintf("%s %s %s\n", tree_entry.file_type, tree_entry.oid, tree_entry.name)
+	}
+
+	oid := data.HashBytes([]byte(tree_str), data.Tree)
+
+	return oid
 }
 
 func isIgnored(entry os.DirEntry) bool {
