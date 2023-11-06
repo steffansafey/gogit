@@ -10,9 +10,9 @@ import (
 )
 
 type TreeEntry struct {
-	name      string
-	oid       string
 	file_type data.FileType
+	oid       string
+	name      string
 }
 
 var writeTreeCommand = &cobra.Command{
@@ -25,7 +25,9 @@ var writeTreeCommand = &cobra.Command{
 			path = args[0]
 		}
 
-		writeTree(path)
+		oid := writeTree(path)
+
+		fmt.Println(oid)
 	},
 }
 
@@ -48,17 +50,21 @@ func writeTree(directory string) string {
 		path := directory + "/" + entry.Name()
 		if entry.IsDir() {
 			oid := writeTree(path)
-			tree_entries = append(tree_entries, TreeEntry{entry.Name(), oid, data.Tree})
+			tree_entries = append(tree_entries, TreeEntry{data.Tree, oid, entry.Name()})
 		} else {
 			oid := data.HashObject(path, data.Blob)
-			tree_entries = append(tree_entries, TreeEntry{entry.Name(), oid, data.Blob})
+			tree_entries = append(tree_entries, TreeEntry{data.Blob, oid, entry.Name()})
 		}
 	}
 
-	// Write the tree_str object to a file
+	// Write the tree_str object to a file, ensuring no newlines after the last line
 	tree_str := ""
-	for _, tree_entry := range tree_entries {
-		tree_str += fmt.Sprintf("%s %s %s\n", tree_entry.file_type, tree_entry.oid, tree_entry.name)
+	for i, tree_entry := range tree_entries {
+		if i == len(tree_entries)-1 {
+			tree_str += fmt.Sprintf("%s %s %s", tree_entry.file_type, tree_entry.oid, tree_entry.name)
+		} else {
+			tree_str += fmt.Sprintf("%s %s %s\n", tree_entry.file_type, tree_entry.oid, tree_entry.name)
+		}
 	}
 
 	oid := data.HashBytes([]byte(tree_str), data.Tree)

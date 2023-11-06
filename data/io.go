@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"os"
+	"strings"
 
 	"gogit/fs"
 )
@@ -87,4 +88,14 @@ func ReadObject(hash string, expected_type FileType) []byte {
 
 	// Return the file_bytes without the type
 	return file_bytes[null_byte_index+1:]
+}
+
+func WriteBlob(path string, oid string) {
+	// Read the file_bytes into memory
+	file_bytes := ReadObject(oid, Blob)
+
+	// Create the directory if it doesn't exist
+	fs.CreateDir(path[:len(path)-len(path[strings.LastIndex(path, "/"):])])
+
+	fs.WriteBlob(path, file_bytes)
 }
