@@ -13,9 +13,10 @@ import (
 type FileType string
 
 const (
-	Blob FileType = "blob"
-	Tree FileType = "tree"
-	Any  FileType = "any"
+	Blob   FileType = "blob"
+	Tree   FileType = "tree"
+	Commit FileType = "commit"
+	Any    FileType = "any"
 )
 
 func HashObject(path string, filetype FileType) string {
