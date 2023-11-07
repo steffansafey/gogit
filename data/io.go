@@ -99,3 +99,15 @@ func WriteBlob(path string, oid string) {
 
 	fs.WriteBlob(path, file_bytes)
 }
+
+// Check that a file or directory is not ignored.
+func IsIgnored(path string) bool {
+	ignored_paths := []string{".gogit"}
+	for _, ignored_path := range ignored_paths {
+		if strings.HasPrefix(path, "./"+ignored_path) {
+			fmt.Println("Ignoring " + path)
+			return true
+		}
+	}
+	return false
+}

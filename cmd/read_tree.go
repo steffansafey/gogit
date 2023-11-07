@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"gogit/data"
+	"gogit/fs"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -64,8 +65,23 @@ func buildFileMap(tree_oid string, base_path string) map[string]string {
 	return tree
 }
 
+func clearWorkingDirectory() {
+	files := fs.RecursivelyListFilesInDir(".")
+
+	// check that the files are not ignored
+	for _, file := range files {
+
+		// TODO: we can move this into the ListFiles maybe
+		if data.IsIgnored("./" + file) {
+			continue
+		}
+		fs.DeleteFile(file)
+	}
+}
+
 // Read the tree object with the given oid and write the files to the working directory
 func readTree(oid string) {
+	clearWorkingDirectory()
 	entries := buildFileMap(oid, ".")
 
 	for k, v := range entries {

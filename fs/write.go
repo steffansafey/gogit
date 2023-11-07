@@ -2,6 +2,7 @@ package fs
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"os"
 )
@@ -33,4 +34,12 @@ func WriteBlob(path string, bytes []byte) []byte {
 	file.Write(bytes)
 
 	return bytes
+}
+
+func DeleteFile(path string) {
+	fmt.Println("Deleting file " + path)
+	err := os.Remove(path)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

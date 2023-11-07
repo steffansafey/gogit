@@ -43,11 +43,12 @@ func writeTree(directory string) string {
 	tree_entries := []TreeEntry{}
 	// Iterate over the files and directories
 	for _, entry := range entries {
-		if isIgnored(entry) {
+
+		path := directory + "/" + entry.Name()
+		if data.IsIgnored(path) {
 			continue
 		}
 
-		path := directory + "/" + entry.Name()
 		if entry.IsDir() {
 			oid := writeTree(path)
 			tree_entries = append(tree_entries, TreeEntry{data.Tree, oid, entry.Name()})
@@ -70,17 +71,6 @@ func writeTree(directory string) string {
 	oid := data.HashBytes([]byte(tree_str), data.Tree)
 
 	return oid
-}
-
-func isIgnored(entry os.DirEntry) bool {
-	ignored_entries := []string{".gogit"}
-
-	for _, ignored_entry := range ignored_entries {
-		if entry.Name() == ignored_entry {
-			return true
-		}
-	}
-	return false
 }
 
 func init() {
