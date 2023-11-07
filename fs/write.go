@@ -22,7 +22,7 @@ func CreateDir(path string) {
 	}
 }
 
-func WriteBlob(path string, bytes []byte) []byte {
+func WriteBytesToFile(path string, bytes []byte) []byte {
 	// write a blob to the given path, overwriting any existing file
 	CreateFile(path)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0644)

@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"gogit/data"
 	"gogit/fs"
+	"gogit/ops"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -25,7 +25,7 @@ func getTreeEntries(tree_oid string) []TreeEntry {
 		return nil
 	}
 
-	tree := data.ReadObject(tree_oid, "tree")
+	tree := ops.ReadObject(tree_oid, "tree")
 	if tree == nil {
 		return nil
 	}
@@ -39,7 +39,7 @@ func getTreeEntries(tree_oid string) []TreeEntry {
 	entries := []TreeEntry{}
 	for _, line := range strings.Split(tree_str, "\n") {
 		components := strings.Split(line, " ")
-		entries = append(entries, TreeEntry{data.FileType(components[0]), components[1], components[2]})
+		entries = append(entries, TreeEntry{ops.FileType(components[0]), components[1], components[2]})
 	}
 
 	return entries
@@ -52,9 +52,9 @@ func buildFileMap(tree_oid string, base_path string) map[string]string {
 	tree := map[string]string{}
 
 	for _, entry := range entries {
-		if entry.file_type == data.Blob {
+		if entry.file_type == ops.Blob {
 			tree[base_path+"/"+entry.name] = entry.oid
-		} else if entry.file_type == data.Tree {
+		} else if entry.file_type == ops.Tree {
 			// We recursively call getTree() on the tree objects.
 			subtree := buildFileMap(entry.oid, base_path+"/"+entry.name)
 			for k, v := range subtree {
@@ -72,7 +72,7 @@ func clearWorkingDirectory() {
 	for _, file := range files {
 
 		// TODO: we can move this into the ListFiles maybe
-		if data.IsIgnored("./" + file) {
+		if ops.PathIsIgnored("./" + file) {
 			continue
 		}
 		fs.DeleteFile(file)
@@ -85,7 +85,7 @@ func readTree(oid string) {
 	entries := buildFileMap(oid, ".")
 
 	for k, v := range entries {
-		data.WriteBlob(k, v)
+		ops.WriteBlob(k, v)
 	}
 
 	fmt.Println(oid)

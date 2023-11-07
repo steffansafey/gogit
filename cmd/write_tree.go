@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"os"
 
-	"gogit/data"
+	"gogit/ops"
 
 	"github.com/spf13/cobra"
 )
 
 type TreeEntry struct {
-	file_type data.FileType
+	file_type ops.FileType
 	oid       string
 	name      string
 }
@@ -45,16 +45,16 @@ func writeTree(directory string) string {
 	for _, entry := range entries {
 
 		path := directory + "/" + entry.Name()
-		if data.IsIgnored(path) {
+		if ops.PathIsIgnored(path) {
 			continue
 		}
 
 		if entry.IsDir() {
 			oid := writeTree(path)
-			tree_entries = append(tree_entries, TreeEntry{data.Tree, oid, entry.Name()})
+			tree_entries = append(tree_entries, TreeEntry{ops.Tree, oid, entry.Name()})
 		} else {
-			oid := data.HashObject(path, data.Blob)
-			tree_entries = append(tree_entries, TreeEntry{data.Blob, oid, entry.Name()})
+			oid := ops.HashObject(path, ops.Blob)
+			tree_entries = append(tree_entries, TreeEntry{ops.Blob, oid, entry.Name()})
 		}
 	}
 
@@ -68,7 +68,7 @@ func writeTree(directory string) string {
 		}
 	}
 
-	oid := data.HashBytes([]byte(tree_str), data.Tree)
+	oid := ops.HashBytes([]byte(tree_str), ops.Tree)
 
 	return oid
 }

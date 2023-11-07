@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"gogit/data"
+	"gogit/ops"
 
 	"github.com/spf13/cobra"
 )
@@ -40,7 +40,10 @@ func createCommit(message string, tree_oid string) string {
 	commit := fmt.Sprintf("tree %s\nauthor %s\n%s\n\n%s\n", tree_oid, author, time_string, message)
 
 	// Write the commit to the objects directory
-	oid := data.HashBytes([]byte(commit), data.Commit)
+	oid := ops.HashBytes([]byte(commit), ops.Commit)
+
+	// Update the HEAD file
+	ops.SetHead(oid)
 
 	return oid
 }

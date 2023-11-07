@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"gogit/data"
+	"gogit/ops"
 
 	"github.com/spf13/cobra"
 )
@@ -12,7 +12,7 @@ var hashObjectCommand = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		// Hash the file and write it to the objects directory
-		data.HashObject(args[0], data.Blob)
+		ops.HashObject(args[0], ops.Blob)
 	},
 }
 

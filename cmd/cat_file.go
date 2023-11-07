@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"gogit/data"
+	"gogit/ops"
 
 	"github.com/spf13/cobra"
 )
@@ -11,7 +11,7 @@ var catFileCommand = &cobra.Command{
 	Short: "Cats a file if it exists in the objects directory",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		bytes := data.ReadObject(args[0], data.Any)
+		bytes := ops.ReadObject(args[0], ops.Any)
 		print(string(bytes))
 	},
 }

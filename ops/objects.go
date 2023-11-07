@@ -1,4 +1,4 @@
-package data
+package ops
 
 import (
 	"crypto/sha1"
@@ -56,7 +56,7 @@ func HashBytes(file_bytes []byte, filetype FileType) string {
 	hash_string := fmt.Sprintf("%x", hash.Sum(nil))
 
 	// Write the file to the objects directory
-	fs.WriteBlob(".gogit/objects/"+hash_string, file_bytes)
+	fs.WriteBytesToFile(".gogit/objects/"+hash_string, file_bytes)
 
 	fmt.Println("wrote obj " + hash_string + " " + string(filetype))
 	return hash_string
@@ -98,11 +98,11 @@ func WriteBlob(path string, oid string) {
 	// Create the directory if it doesn't exist
 	fs.CreateDir(path[:len(path)-len(path[strings.LastIndex(path, "/"):])])
 
-	fs.WriteBlob(path, file_bytes)
+	fs.WriteBytesToFile(path, file_bytes)
 }
 
 // Check that a file or directory is not ignored.
-func IsIgnored(path string) bool {
+func PathIsIgnored(path string) bool {
 	ignored_paths := []string{".gogit"}
 	for _, ignored_path := range ignored_paths {
 		if strings.HasPrefix(path, "./"+ignored_path) {
